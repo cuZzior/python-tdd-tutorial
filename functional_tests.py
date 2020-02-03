@@ -1,5 +1,7 @@
 import unittest
+import time
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 
 
 class NewVisitorTest(unittest.TestCase):
@@ -15,17 +17,31 @@ class NewVisitorTest(unittest.TestCase):
 
         # Widzi 'To-Do' w tytule strony
         self.assertIn('To-Do', self.browser.title)
-        self.fail('Finish the test!')
+        header_text = self.browser.find_element_by_tag_name('h1').text
+        self.assertIn('To-Do', header_text)
 
         # Odrazu ma mozliwosc dodawania to-do listy
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertEqual(
+            inputbox.get_attribute('placeholder'), 'Enter a to-do item'
+        )
 
         # Dodaje "Kup karme dla kota" bo kocha koty
+        inputbox.send_keys('Kup karme dla kota')
 
         # Klika enter i strone sie aktualizuje, widac w niej
         # "1: Kup karme dla kota" w liscie to-do
+        inputbox.send_keys(Keys.ENTER)
+        time.sleep(1)
 
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertTrue(
+            any(row.text == '1: Kup karme dla kota' for row in rows)
+        )
         # Wciaz widzi tekst proponujacy dodanie nowego to-do
         # Dodaje "Nasyp tej karmy kotkowi"
+        self.fail('Finish the test!')
 
         # Po kliknieciu enter strona znowu sie aktualizuje i teraz widzi 2 punkty
 
